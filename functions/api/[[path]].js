@@ -1,17 +1,6 @@
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json;charset=utf-8','cache-control':'no-store'}});
 const b64=(bytes)=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-async function signature(secret,msg){
-  const key=await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    {name:'HMAC',hash:'SHA-256'},
-    false,
-    ['sign']
-  );
-  return b64(await crypto.subtle.sign(
-    'HMAC',key,new TextEncoder().encode(msg)
-  ));
-}
+async function signature(secret,msg){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return b64(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(msg)))}
 async function auth(req,env){const tok=(req.headers.get('authorization')||'').replace(/^Bearer /,'');const [expiry,sig]=tok.split('.');if(!expiry||!sig||Number(expiry)<Date.now()||!env.ADMIN_PASSWORD)return false;return sig===await signature(env.ADMIN_PASSWORD,expiry)}
 export async function onRequest({request,env,params}){
 try{
