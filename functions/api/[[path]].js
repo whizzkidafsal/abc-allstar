@@ -36,6 +36,7 @@ function playerFields(p, cols, isNew) {
   }
   if (cols.has('rank')) v.rank = Number(p.rank) || 0;
   if (cols.has('notes')) v.notes = String(p.notes ?? '');
+  if (cols.has('phone')) v.phone = String(p.phone ?? '').replace(/[^0-9+]/g,'').slice(0,16);
   if (isNew && cols.has('edit_code')) {
     v.edit_code = Array.from(crypto.getRandomValues(new Uint8Array(6)), x => (x % 36).toString(36)).join('').toUpperCase();
   }
@@ -68,7 +69,7 @@ export async function onRequest({request, env, params}) {
       if (!row || !row.edit_code || row.edit_code !== String(x.code || '').trim().toUpperCase()) return json({error:'Invalid personal code'},403);
       if (route === '/self') return json({player:playerOutput(row)});
       const v = playerFields({name:row.name,birthday:x.birthday,blood:x.blood,court:x.court,photo:x.photo,grade:row.grade},cols,false);
-      delete v.name; delete v.grade; delete v.rank; delete v.notes;
+      delete v.name; delete v.grade; delete v.rank; delete v.notes; delete v.phone;
       if (cols.has('updated_at')) v.updated_at = new Date().toISOString();
       const keys = Object.keys(v);
       if (keys.length) await env.DB.prepare(`UPDATE players SET ${keys.map(k=>`${k}=?`).join(',')} WHERE id=?`).bind(...keys.map(k=>v[k]),x.id).run();
