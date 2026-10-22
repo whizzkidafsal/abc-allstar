@@ -32,7 +32,7 @@ function playerFields(p, cols, isNew) {
   if (cols.has('photo_key')) v.photo_key = photo;
   if (cols.has('grade')) {
     const grade = String(p.grade ?? '').trim().toUpperCase();
-    v.grade = ['A','B','C','D'].includes(grade) ? grade : 'D';
+    v.grade = ['A','B','C+','C','D+','D','E'].includes(grade) ? grade : 'D';
   }
   if (cols.has('rank')) v.rank = Number(p.rank) || 0;
   if (cols.has('notes')) v.notes = String(p.notes ?? '');
@@ -102,7 +102,7 @@ export async function onRequest({request, env, params}) {
       const {grades} = await request.json();
       if (!Array.isArray(grades) || grades.length > 100) return json({error:'Invalid grades'},400);
       const names = grades.map(g=>String(g.name || '').trim().toUpperCase());
-      if (names.some(n=>!['A','B','C','D'].includes(n)) || new Set(names).size !== names.length) return json({error:'Only unique grades A, B, C, D are allowed'},400);
+      if (names.some(n=>!['A','B','C+','C','D+','D','E'].includes(n)) || new Set(names).size !== names.length) return json({error:'Only unique grades A, B, C+, C, D+, D, E are allowed'},400);
       const existing = await env.DB.prepare('SELECT id,name FROM grades').all();
       const byId = new Map(existing.results.map(g=>[String(g.id),g]));
       const byName = new Map(existing.results.map(g=>[g.name,g]));
@@ -116,7 +116,7 @@ export async function onRequest({request, env, params}) {
       if (batch.length) await env.DB.batch(batch);
       return json({ok:true});
     }
-    if (route === '/grades' && method === 'DELETE') return json({error:'A/B/C/D grades cannot be deleted'},400);
+    if (route === '/grades' && method === 'DELETE') return json({error:'Grades cannot be deleted'},400);
     return json({error:'Not found'},404);
   } catch(e) { return json({error:e.message || 'Unexpected error'},500); }
 }
