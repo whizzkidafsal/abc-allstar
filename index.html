@@ -76,4 +76,5 @@ cropStage.onpointermove=e=>{if(!cropDragging)return;cropX+=e.clientX-cropLastX;c
 cropStage.onpointerup=()=>cropDragging=false;
 $('cropCancel').onclick=()=>{$('cropOverlay').classList.remove('active');cropBitmap=null};
 $('cropSave').onclick=()=>{if(!cropBitmap)return;const {n,w,h}=cropMetrics(),c=document.createElement('canvas');c.width=c.height=400;const ctx=c.getContext('2d');ctx.drawImage(cropBitmap,((n-w)/2+cropX)*400/n,((n-h)/2+cropY)*400/n,w*400/n,h*400/n);const data=c.toDataURL('image/jpeg',.82);if(cropSelf){selfPhotoData=data;$('selfPreview').src=data;$('selfPreview').style.display='block'}else{photoData=data;$('preview').src=data;$('preview').style.display='block'}$('cropOverlay').classList.remove('active');cropBitmap=null};
-</script></body></html>
+</script><a href="/auction.html" style="position:fixed;bottom:12px;right:12px;background:#133f74;color:white;padding:9px 15px;border-radius:20px;text-decoration:none;z-index:9999;font:bold 14px Arial">AUCTION</a>
+</body></html>
