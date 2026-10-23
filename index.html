@@ -67,7 +67,7 @@ $('gradeEditor').onclick=async e=>{const move=e.target.closest('[data-move]'),re
 
 let cropSelf=false,cropBitmap=null,cropScale=1,cropX=0,cropY=0,cropDragging=false,cropLastX=0,cropLastY=0;
 const cropStage=$('cropStage'),cropImage=$('cropImage');
-async function openCrop(file,isSelf){if(!file)return;try{const url=URL.createObjectURL(file),im=new Image();await new Promise((ok,bad)=>{im.onload=ok;im.onerror=bad;im.src=url});URL.revokeObjectURL(url);cropBitmap=im;cropSelf=isSelf;cropScale=1;cropX=0;cropY=0;$('cropZoom').value=1;$('cropOverlay').classList.add('active');drawCrop()}catch(e){status('Photo could not be loaded',true)}}
+async function openCrop(file,isSelf){if(!file)return;try{const url=URL.createObjectURL(file),im=new Image();await new Promise((ok,bad)=>{im.onload=ok;im.onerror=bad;im.src=url});cropImage.src=url;cropImage.onload=()=>URL.revokeObjectURL(url);cropBitmap=im;cropSelf=isSelf;cropScale=1;cropX=0;cropY=0;$('cropZoom').value=1;$('cropOverlay').classList.add('active');drawCrop()}catch(e){status('Photo could not be loaded',true)}}
 function cropMetrics(){const n=cropStage.clientWidth,base=Math.max(n/cropBitmap.naturalWidth,n/cropBitmap.naturalHeight);return {n,w:cropBitmap.naturalWidth*base*cropScale,h:cropBitmap.naturalHeight*base*cropScale}}
 function drawCrop(){if(!cropBitmap)return;const {n,w,h}=cropMetrics();cropX=Math.max((n-w)/2,Math.min((w-n)/2,cropX));cropY=Math.max((n-h)/2,Math.min((h-n)/2,cropY));cropImage.style.width=w+'px';cropImage.style.height=h+'px';cropImage.style.left=(n-w)/2+cropX+'px';cropImage.style.top=(n-h)/2+cropY+'px'}
 $('cropZoom').oninput=e=>{cropScale=+e.target.value;drawCrop()};
